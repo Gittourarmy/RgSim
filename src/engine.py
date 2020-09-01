@@ -6,18 +6,20 @@ def main():
 	screen_width = 80
 	screen_height = 50
 
-	tcod.console_set_custom_font(FONT_PATH+'arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
-	tcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
+	tileset = tcod.tileset.load_tilesheet(FONT_PATH+'arial10x10.png', 32, 8, tcod.tileset.CHARMAP_TCOD)
+	console = tcod.Console(screen_width, screen_height)
 	
-	while not tcod.console_is_window_closed():
-		tcod.console_set_default_foreground(0, tcod.white)
-		tcod.console_put_char(0, 1, 1, '@', tcod.BKGND_NONE)
-		tcod.console_flush()
+	with tcod.context.new_terminal(console.width, console.height, tileset=tileset,) as context:
+		while True:
+			console.clear()
+			console.print(x=1, y=1, string="@")
+			context.present(console)
 
-		key = tcod.console_check_for_keypress()
-
-		if key.vk == tcod.KEY_ESCAPE:
-			return True
+			for event in tcod.event.wait():
+				context.convert_event(event)
+				print(event)  
+				if event.type == "QUIT":
+					raise SystemExit()
 
 if __name__ == '__main__':
 	main()
